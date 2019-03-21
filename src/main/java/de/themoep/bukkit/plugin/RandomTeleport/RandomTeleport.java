@@ -104,7 +104,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard")){
             String[] version = Bukkit.getPluginManager().getPlugin("WorldGuard").getDescription().getVersion().split(" ")[0].split("-")[0].split("\\.");
             worldguardVersion = Integer.parseInt(version[0]);
-            getLogger().log(Level.INFO, "Detected WorldGuard " + worldguardVersion + ".");
+            getLogger().log(Level.INFO, "Detected WorldGuard {0}.", worldguardVersion);
         }
 
         if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")) {
@@ -130,6 +130,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         debugLevel = getConfig().getBoolean("debug", false) ? Level.INFO : Level.FINER;
     }
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
         if(cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) {
             boolean forceBlocks = false;
@@ -154,14 +155,14 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             int maxRange;
             int cooldowntime = 0;
             World world = null;
-            List<Biome> biomeList = new ArrayList<Biome>();
+            List<Biome> biomeList = new ArrayList<>();
 
             if(args.length == 0 && sender.hasPermission("randomteleport.presets.default")) {
                 if(getConfig().getString("presets.default") != null) {
                     String defaultcmd = getConfig().getString("presets.default").replace("/", "");
                     defaultcmd = defaultcmd + " -p " + sender.getName();
                     getServer().dispatchCommand(getServer().getConsoleSender(),defaultcmd);
-                    getLogger().log(debugLevel, "Running preset command default: " + defaultcmd);
+                    getLogger().log(debugLevel, "Running preset command default: {0}", defaultcmd);
                     return true;
                 }
             }
@@ -195,7 +196,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
                 String presetCmd = getConfig().getString("presets." + args[0].toLowerCase()).replace("/", "");
                 presetCmd = presetCmd + " -p " + sender.getName();
-                getLogger().log(debugLevel, "Running preset command " + args[0].toLowerCase() + ": " + presetCmd);
+                getLogger().log(debugLevel, "Running preset command {0}: {1}", new Object[]{args[0].toLowerCase(), presetCmd});
                 getServer().dispatchCommand(getServer().getConsoleSender(), presetCmd);
                 return true;
             }
@@ -253,7 +254,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                             playername = args[i+1];
                             player = Bukkit.getServer().getPlayer(playername);
                             i++;
-                            getLogger().log(debugLevel, "Player: " + playername);
+                            getLogger().log(debugLevel, "Player: {0}", playername);
                             if(player == null) {
                                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Player '" + playername + "' was not found online!");
                                 return true;
@@ -264,7 +265,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 return true;
                             }
 
-                            getLogger().log(debugLevel, "World: " + args[i+1]);
+                            getLogger().log(debugLevel, "World: {0}", args[i+1]);
                             world = Bukkit.getServer().getWorld(args[i+1]);
                             if(world == null) {
                                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The world \"" + args[i+1] + "\" given in the " + args[i] + " option does not exist!");
@@ -290,7 +291,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                     return true;
                                 }
                             }
-                            if(biomeList.size() == 0) {
+                            if(biomeList.isEmpty()) {
                                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Please specify at least one biome after the -biome option!");
                                 return true;
                             }
@@ -309,7 +310,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains a invalid number in the " + args[i] + " option!");
                                 return true;
                             }
-                            getLogger().log(debugLevel, "xCenter: " + xCenter);
+                            getLogger().log(debugLevel, "xCenter: {0}", xCenter);
                         } else if(args[i].equalsIgnoreCase("-z") || args[i].equalsIgnoreCase("-zPos")) {
                             if(i+1 >= args.length || (args[i+1].startsWith("-") && !isNumeric(args[i+1].substring(1)))) {
                                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The " + args[i] + " option needs an argument (" + args[i] + " value)!");
@@ -323,7 +324,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains a invalid number in the " + args[i] + " option!");
                                 return true;
                             }
-                            getLogger().log(debugLevel, "zCenter: " + zCenter);
+                            getLogger().log(debugLevel, "zCenter: {0}", zCenter);
                         } else if(args[i].equalsIgnoreCase("-l") || args[i].equalsIgnoreCase("-loaded")) {
                             if(i+1 >= args.length || args[i+1].startsWith("-")) {
                                 loadedChunksOnly = true;
@@ -342,7 +343,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains a invalid number in the " + args[i] + " option!");
                                 return true;
                             }
-                            getLogger().log(debugLevel, "cooldowntime: " + cooldowntime);
+                            getLogger().log(debugLevel, "cooldowntime: {0}", cooldowntime);
                         } else if(args[i].equalsIgnoreCase("-f") || args[i].equalsIgnoreCase("-force")) {
                             if(i+1 >= args.length || args[i+1].startsWith("-")) {
                                 forceBlocks = true;
@@ -355,8 +356,8 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 }
                                 i++;
                             }
-                            getLogger().log(debugLevel, "forceBlocks: " + forceBlocks);
-                            getLogger().log(debugLevel, "forceRegions: " + forceRegions);
+                            getLogger().log(debugLevel, "forceBlocks: {0}", forceBlocks);
+                            getLogger().log(debugLevel, "forceRegions: {0}", forceRegions);
                         } else if(args[i].equalsIgnoreCase("-sp") || args[i].equalsIgnoreCase("-spawnpoint")) {
                             if(i+1 >= args.length || args[i+1].startsWith("-")) {
                                 setSpawnpoint = 1;
@@ -368,10 +369,10 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 }
                                 i++;
                             }
-                            getLogger().log(debugLevel, "setSpawnpoint: " + setSpawnpoint);
+                            getLogger().log(debugLevel, "setSpawnpoint: {0}", setSpawnpoint);
                         } else {
                             sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains an invalid option (" + args[i] + ")!");
-                            getLogger().log(debugLevel, "invalid: " + args[i]);
+                            getLogger().log(debugLevel, "invalid: {0}", args[i]);
                             return false;
                         }
                     }
@@ -468,11 +469,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                 zCenter = (int) player.getLocation().getZ();
             }
 
-            getLogger().log(debugLevel, "RandomTeleport for player '" + playername + "' with minRange " + minRange + " maxRange " + maxRange + " xCenter " + xCenter + " zCenter " + zCenter + " forceBlocks=" + forceBlocks + " forceRegions=" + forceRegions);
+            getLogger().log(debugLevel, "RandomTeleport for player ''{0}'' with minRange {1} maxRange {2} xCenter {3} zCenter {4} forceBlocks={5} forceRegions={6}", new Object[]{playername, minRange, maxRange, xCenter, zCenter, forceBlocks, forceRegions});
             if(biomeList.size() > 0) {
                 getLogger().log(Level.INFO, "Biomelist:");
                 for(Biome biome : biomeList) {
-                    getLogger().log(Level.INFO, " " + biome);
+                    getLogger().log(Level.INFO, " {0}", biome);
                 }
             }
 
@@ -483,7 +484,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             int chunksum = 0;
             int chunksumold = 0;
 
-            List<Integer[]> chunklist = new ArrayList<Integer[]>();
+            List<Integer[]> chunklist = new ArrayList<>();
 
             if(loadedChunksOnly)
                 for(Chunk c : world.getLoadedChunks())
@@ -525,11 +526,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                         if(!sender.getName().equalsIgnoreCase(player.getName())){
                             player.sendMessage(getTranslation("error.location"));
                         }
-                        getLogger().log(Level.INFO, "Error: RandomTeleport could not find a save location after " + count + " tries for the player '" + playername + "' (minRange " + minRange + " maxRange " + maxRange + " xCenter " + xCenter + " zCenter " + zCenter + " forceBlocks=" + forceBlocks + " forceRegions=" + forceRegions + ")");
+                        getLogger().log(Level.INFO, "Error: RandomTeleport could not find a save location after {0} tries for the player ''{1}'' (minRange {2} maxRange {3} xCenter {4} zCenter {5} forceBlocks={6} forceRegions={7})", new Object[]{count, playername, minRange, maxRange, xCenter, zCenter, forceBlocks, forceRegions});
                         if(biomeList.size() > 0) {
                             getLogger().log(Level.INFO, "Biomelist:");
                             for(Biome biome : biomeList) {
-                                getLogger().log(Level.INFO, " " + biome);
+                                getLogger().log(Level.INFO, " {0}", biome);
                             }
                         }
                         checkstat[count-1] = checkstat[count-1]++;
@@ -565,7 +566,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
                         }
                     }
-                    getLogger().log(debugLevel, "RandomTeleport (" + chunkcount + ". try) found " + chunksum + " unprotected chunks around the location " + x + "/" + z);
+                    getLogger().log(debugLevel, "RandomTeleport ({0}. try) found {1} unprotected chunks around the location {2}/{3}", new Object[]{chunkcount, chunksum, x, z});
 
 
                     // if more not protected chunks were found then at the last random location:
@@ -592,7 +593,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             if(!teleportPlayer(playername,x,z,world,setSpawnpoint)) {
                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Player '" + playername + "' is not online anymore!");
             } else {
-                getLogger().log(debugLevel, "Used teleport location X: " + x + " Z: " + z + " for player '" + playername + "' RandomTeleportID: " + cooldownid);
+                getLogger().log(debugLevel, "Used teleport location X: {0} Z: {1} for player ''{2}'' RandomTeleportID: {3}", new Object[]{x, z, playername, cooldownid});
             }
             if(coption && !player.hasPermission("randomteleport.cooldownexempt")){
                 cooldown.put(cooldownid, System.currentTimeMillis());
@@ -669,7 +670,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         int y = world.getHighestBlockYAt(x, z);
         Block highest = world.getBlockAt(x, y - 1, z);
 
-        getLogger().log(debugLevel, "Checked teleport location for player '" + player.getName() + "' X: " + x + " Y: " + (y - 1) + "  Z: " + z + " is " + highest.getType() + " + " + world.getBlockAt(x, y + 1, z).getType() + ", Biome: " + highest.getBiome().toString());
+        getLogger().log(debugLevel, "Checked teleport location for player ''{0}'' X: {1} Y: {2}  Z: {3} is {4} + {5}, Biome: {6}", new Object[]{player.getName(), x, y - 1, z, highest.getType(), world.getBlockAt(x, y + 1, z).getType(), highest.getBiome().toString()});
 
         if(biomeList.size() > 0 && !biomeList.contains(highest.getBiome())) {
             return false;
@@ -751,14 +752,12 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                     throw new IOException("Error creating new file: " + file.getPath());
                 }
             }
-            FileOutputStream fileOut = new FileOutputStream(file.getPath());
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(object);
-            out.close();
-            fileOut.close();
-            getLogger().fine("Serialized data is saved in " + file.getPath());
-        } catch(IOException i) {
-            i.printStackTrace();
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getPath()))) {
+                out.writeObject(object);
+            }
+            getLogger().log(Level.FINE, "Serialized data is saved in {0}", file.getPath());
+        } catch(IOException e) {
+            getLogger().log(Level.WARNING, "Problem writing map",  e);
         }
     }
 
@@ -769,38 +768,34 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      */
     @SuppressWarnings("unchecked")
     public HashMap readMap(String inputFile) {
-        HashMap<Object, Object> map = new HashMap<Object,Object>();
+        HashMap<Object, Object> map = new HashMap<>();
         File file = new File(getDataFolder(), inputFile);
         if (!file.isFile()) {
-            getLogger().log(Level.INFO, "No file found in " + file.getPath());
+            getLogger().log(Level.INFO, "No file found in {0}", file.getPath());
             try {
                 if(!file.createNewFile()) {
                     throw new IOException("Error while creating new file: " + file.getPath());
                 } else {
                     writeMap(map, inputFile);
-                    getLogger().log(Level.INFO, "New file created in " + file.getPath());
+                    getLogger().log(Level.INFO, "New file created in {0}", file.getPath());
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                getLogger().log(Level.WARNING, "Problem creating new map",  e);
             }
         }
-        try {
-            FileInputStream fileIn = new FileInputStream(file.getPath());
-            ObjectInputStream in = new ObjectInputStream(fileIn);
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file.getPath()))) {
             map = (HashMap<Object, Object>) in.readObject();
-            in.close();
-            fileIn.close();
-            getLogger().log(Level.INFO, "Sucessfully loaded cooldown.map.");
         } catch(IOException i) {
-            getLogger().log(Level.WARNING, "No saved Map found in " + inputFile);
+            getLogger().log(Level.WARNING, "No saved Map found in {0}", inputFile);
         } catch(ClassNotFoundException e) {
-            e.printStackTrace();
+            getLogger().log(Level.WARNING, "Problem reading map",  e);
         }
+        getLogger().log(Level.INFO, "Sucessfully loaded cooldown.map.");
         return map;
     }
 
     /**
-     * Checks if a string is mumeric
+     * Checks if a string is numeric
      * @param str to test
      * @return True if input string is numeric
      */
