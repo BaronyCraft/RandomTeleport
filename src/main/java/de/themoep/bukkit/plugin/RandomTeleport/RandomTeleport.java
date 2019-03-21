@@ -81,7 +81,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     private HashSet<UUID> playerlock = new HashSet<>();
     private int[] checkstat = new int[100];
 
-    private int factionsApiVersion = 0;
     private int worldguardVersion = 0;
     private boolean clancontrol = false;
     private boolean griefprevention = false;
@@ -122,22 +121,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             getLogger().log(Level.INFO, "Detected WorldBorder.");
             worldborder = true;
         }
-
-        if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
-            String[] version = Bukkit.getPluginManager().getPlugin("Factions").getDescription().getVersion().split(" ")[0].split("-")[0].split("\\.");
-            int major = Integer.parseInt(version[0]);
-            int minor = Integer.parseInt(version[1]);
-
-            if(major >= 2 && minor >= 7) {
-                factionsApiVersion = 27;
-            } else if (major >= 2 && minor >= 6) {
-                factionsApiVersion = 26;
-            } else if (major >= 1 && minor >= 6){
-                factionsApiVersion = 16;
-            }
-            getLogger().log(Level.INFO, "Detected Factions " + major + "." + minor + " (" + factionsApiVersion + ")");
-        }
-
     }
 
     private void loadConfig() {
@@ -572,7 +555,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                 chunksum = 0;
 
                 // checks a square of 9x9 chunks around the random position for protected regions
-                if(worldguardVersion > 0 || factionsApiVersion > 0 || griefprevention || clancontrol) {
+                if(worldguardVersion > 0 || griefprevention || clancontrol) {
                     for(int i = -4; i <= 4; i++) {
                         for(int j = -4; j <= 4; j++) {
                             int xcheck = x + i * 16;
@@ -751,24 +734,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                     return false;
                 }
             }
-            if(factionsApiVersion == 27) {
-                com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColl.get().getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(block));
-                if(faction != com.massivecraft.factions.entity.FactionColl.get().getNone()) {
-                    return false;
-                }
-            }
-            if(factionsApiVersion == 26) {
-                com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColls.get().getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(block));
-                if(faction != com.massivecraft.factions.entity.FactionColls.get().getForWorld(location.getWorld().getName()).getNone()) {
-                    return false;
-                }
-            }
-            if(factionsApiVersion == 16) {
-                com.massivecraft.factions.Faction faction = com.massivecraft.factions.Board.getInstance().getFactionAt(new com.massivecraft.factions.FLocation(location));
-                if(faction != com.massivecraft.factions.Factions.getInstance().getNone()) {
-                    return false;
-                }
-            }
         }
         return true;
     }
@@ -778,7 +743,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      * @param object The Hashmap to write
      * @param outputFile The file to write to
      */
-    public void writeMap(Object object, String outputFile) {
+    public void writeMap(HashMap object, String outputFile) {
         try {
             File file = new File(getDataFolder(), outputFile);
             if (!file.isFile()) {
@@ -803,7 +768,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      * @return An Object which is a HashMap<Object,Object>
      */
     @SuppressWarnings("unchecked")
-    public Object readMap(String inputFile) {
+    public HashMap readMap(String inputFile) {
         HashMap<Object, Object> map = new HashMap<Object,Object>();
         File file = new File(getDataFolder(), inputFile);
         if (!file.isFile()) {
